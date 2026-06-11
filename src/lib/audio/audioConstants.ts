@@ -43,6 +43,13 @@ export const IN_TUNE_RELEASE_CENTS = 8
 /** Quadros consecutivos dentro da faixa para travar em "afinado". */
 export const IN_TUNE_FRAMES = 3
 
+/**
+ * Quadros consecutivos exigidos para TROCAR a nota exibida. Durante o transiente
+ * do ataque (palhetada), o detector cospe notas erradas por 1–2 quadros; segurar
+ * a nota anterior até a nova se confirmar evita mostrar tons intermediários.
+ */
+export const NOTE_LOCK_FRAMES = 4
+
 /** Faixa de frequência válida (Hz). Abaixo/acima é ignorado como ruído. */
 export const MIN_FREQ = 28
 export const MAX_FREQ = 1300
