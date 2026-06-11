@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
+  ATTACK_FLOOR,
+  ATTACK_RATIO,
   CLARITY_THRESHOLD,
   DETECT_INTERVAL_MS,
   HOLD_MS,
@@ -24,10 +26,11 @@ export interface PitchDetectionState {
  * Laço de requestAnimationFrame que lê o domínio do tempo do analyser, aplica
  * gate de ruído e devolve a leitura crua.
  *
- * Persistência: a leitura fica ativa por até MAX_PERSIST_MS (~2s) a partir do
- * início de cada toque. Repalhetar (ataque) reinicia a janela, então a nota só
- * some ~2s depois do último toque — nem curto demais, nem "preso" ressoando.
- * HOLD_MS apenas faz a ponte de micro-quedas dentro de um toque.
+ * Persistência por "janela rearmável" (sem estado preso): cada palhetada — uma
+ * borda de subida do volume, ou o primeiro som após silêncio — arma a exibição
+ * por ~MAX_PERSIST_MS (2s). Passada a janela sem nova palhetada, a tela limpa,
+ * mesmo que a corda ainda ressoe. Como tudo deriva de timestamps/bordas, um
+ * toque novo sempre reativa e nunca trava.
  */
 export function usePitchDetection(
   analyser: AnalyserNode | null,
@@ -44,18 +47,20 @@ export function usePitchDetection(
     }
 
     const buffer = new Float32Array(analyser.fftSize)
+    const ctx = analyser.context as AudioContext
     let raf = 0
     let last = 0
     let lastGood = 0 // instante do último quadro bom
-    let onset = 0 // início do toque atual
+    let armUntil = 0 // exibe enquanto t <= armUntil
     let prevRms = 0
-    let active = false // exibindo leitura
-    let capped = false // suprimido após estourar a janela num toque sustentado
 
     const loop = (t: number) => {
       raf = requestAnimationFrame(loop)
       if (t - last < DETECT_INTERVAL_MS) return
       last = t
+
+      // Rede de segurança: o celular pode suspender o AudioContext após um tempo.
+      if (ctx.state === 'suspended') void ctx.resume().catch(() => {})
 
       analyser.getFloatTimeDomainData(buffer)
       const rms = computeRMS(buffer)
@@ -66,37 +71,23 @@ export function usePitchDetection(
         if (r && r.clarity >= CLARITY_THRESHOLD) result = r
       }
 
-      const isAttack = !!result && rms > prevRms * 1.7 && rms > 0.02
+      const wasSilent = t - lastGood > HOLD_MS
+      const isOnset =
+        !!result && (wasSilent || (rms > prevRms * ATTACK_RATIO && rms > ATTACK_FLOOR))
       prevRms = rms
 
       if (result) {
-        const gap = t - lastGood > HOLD_MS // houve silêncio real antes deste quadro
         lastGood = t
-        if (gap) capped = false // recomeço limpo após silêncio real
-
-        if (capped && !isAttack) {
-          // mesmo toque que já estourou a janela → segue suprimido
+        if (isOnset) armUntil = t + MAX_PERSIST_MS // (re)arma ~2s a cada palhetada
+        if (t <= armUntil) {
+          setReading({ frequency: result.frequency, clarity: result.clarity, rms })
+          setSilent(false)
         } else {
-          if (!active || isAttack || gap) {
-            onset = t // novo toque → reinicia a janela de persistência
-            active = true
-          }
-          if (t - onset > MAX_PERSIST_MS) {
-            // a janela de ~2s estourou neste toque sustentado → limpa a tela
-            active = false
-            capped = true
-            setSilent(true)
-          } else {
-            setReading({ frequency: result.frequency, clarity: result.clarity, rms })
-            setSilent(false)
-          }
-        }
-      } else if (t - lastGood > HOLD_MS) {
-        capped = false // silêncio real
-        if (active) {
-          active = false
+          // janela de ~2s expirou; aguarda nova palhetada para rearmar
           setSilent(true)
         }
+      } else if (t - lastGood > HOLD_MS) {
+        setSilent(true)
       }
     }
 

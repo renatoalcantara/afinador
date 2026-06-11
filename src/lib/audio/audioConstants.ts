@@ -34,6 +34,14 @@ export const HOLD_MS = 1200
  */
 export const MAX_PERSIST_MS = 2000
 
+/**
+ * Detecção de ataque (palhetada): borda de subida do volume. Usada para
+ * (re)armar a janela de persistência e para resetar a suavização. Comparar o
+ * RMS atual com o anterior; precisa subir ATTACK_RATIO× e passar de ATTACK_FLOOR.
+ */
+export const ATTACK_RATIO = 1.6
+export const ATTACK_FLOOR = 0.015
+
 /** Suavização: tamanho do histórico para o filtro de mediana. */
 export const SMOOTHING_HISTORY = 5
 

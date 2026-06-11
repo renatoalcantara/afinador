@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
+  ATTACK_FLOOR,
+  ATTACK_RATIO,
   IN_TUNE_CENTS,
   IN_TUNE_FRAMES,
   IN_TUNE_RELEASE_CENTS,
@@ -108,7 +110,7 @@ export function useTuner({
     // Ataque (corda recém-tocada): o volume sobe de repente. Reseta a suavização
     // para a frequência convergir rápido na nota nova (a trava de estabilidade
     // abaixo é quem evita exibir o transiente ruidoso).
-    const isAttack = raw.rms > prevRmsRef.current * 1.7 && raw.rms > 0.02
+    const isAttack = raw.rms > prevRmsRef.current * ATTACK_RATIO && raw.rms > ATTACK_FLOOR
     prevRmsRef.current = raw.rms
     if (isAttack) smootherRef.current.reset()
 
