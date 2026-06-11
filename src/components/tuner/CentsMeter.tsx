@@ -31,12 +31,18 @@ export function CentsMeter({ reading, silent }: CentsMeterProps) {
   const dimmed = silent ? 'opacity-40' : ''
 
   return (
-    <div className={`flex flex-col items-center gap-1 transition-opacity ${dimmed}`}>
-      <span className={`font-mono text-sm ${inTune ? 'text-success' : 'text-text-soft'}`}>
+    <div className={`flex flex-col items-center gap-1 transition-opacity duration-300 ${dimmed}`}>
+      <span
+        className={`font-mono text-sm tabular-nums transition-colors duration-300 ${
+          inTune ? 'text-success' : 'text-text-soft'
+        }`}
+      >
         {sign}
         {cents} ¢
       </span>
-      <span className={`text-sm font-medium ${statusColor}`}>{status}</span>
+      <span className={`text-sm font-medium transition-colors duration-300 ${statusColor}`}>
+        {status}
+      </span>
     </div>
   )
 }

@@ -46,9 +46,13 @@ export function MicPermissionPrompt({ state, error, onStart }: MicPermissionProm
 
   const showButton = state === 'idle' || state === 'denied' || state === 'error'
 
+  const iconAnim = state === 'idle' || state === 'requesting' ? 'animate-pulse-soft' : ''
+
   return (
-    <div className="flex flex-col items-center gap-4 px-6 text-center">
-      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-surface-2 text-brand">
+    <div className="flex animate-fade-in-up flex-col items-center gap-4 px-6 text-center">
+      <div
+        className={`flex h-20 w-20 items-center justify-center rounded-full bg-surface-2 text-brand ${iconAnim}`}
+      >
         <MicIcon />
       </div>
       <div>

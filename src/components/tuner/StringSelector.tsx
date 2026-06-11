@@ -39,12 +39,13 @@ export function StringSelector({
               aria-label={`Corda ${s.label} (${solfegeOf(s.note)})`}
               aria-pressed={isManual}
               onClick={() => onSelect(isManual ? null : i)}
-              className={`relative flex h-11 w-11 items-center justify-center rounded-full border text-sm font-semibold transition-colors ${selected}`}
+              style={{ animationDelay: `${i * 40}ms` }}
+              className={`relative flex h-11 w-11 animate-pop-in items-center justify-center rounded-full border text-sm font-semibold transition duration-200 active:scale-90 ${selected}`}
             >
               {s.note}
               <span className="text-[10px]">{s.octave}</span>
               {isManual && (
-                <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-brand" />
+                <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-pop-in rounded-full bg-brand" />
               )}
             </button>
           )

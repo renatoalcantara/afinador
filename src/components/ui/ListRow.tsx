@@ -40,7 +40,7 @@ function Body({ icon, title, subtitle, trailing }: Omit<ListRowProps, 'to' | 'hr
 /** Linha de lista para a tela de Preferências. Vira <Link>, <a> ou <div>. */
 export function ListRow({ to, href, ...rest }: ListRowProps) {
   const cls =
-    'flex items-center gap-3 px-4 py-3.5 bg-surface border-b border-border last:border-b-0 transition-colors hover:bg-surface-2'
+    'flex items-center gap-3 px-4 py-3.5 bg-surface border-b border-border last:border-b-0 transition duration-150 hover:bg-surface-2 active:bg-surface-2 active:scale-[0.99]'
 
   if (to) {
     return (

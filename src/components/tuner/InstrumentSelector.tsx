@@ -22,7 +22,7 @@ export function InstrumentSelector({ value, onChange }: InstrumentSelectorProps)
             role="radio"
             aria-checked={active}
             onClick={() => onChange(inst.id)}
-            className={`shrink-0 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+            className={`shrink-0 rounded-full border px-4 py-2 text-sm font-medium transition duration-200 active:scale-95 ${
               active
                 ? 'border-text bg-text text-bg'
                 : 'border-border bg-surface text-text-soft hover:text-text'

@@ -30,7 +30,7 @@ function SettingsIcon() {
 }
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
-  `flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-medium transition-colors ${
+  `flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-medium transition duration-200 active:scale-90 ${
     isActive ? 'text-brand' : 'text-text-faint hover:text-text-soft'
   }`
 

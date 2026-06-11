@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react'
+
 interface TunerGaugeProps {
   /** desvio em cents (null quando não há leitura) */
   cents: number | null
@@ -21,10 +23,58 @@ function polar(centValue: number, r: number) {
   }
 }
 
-/** Mostrador semicircular: ponteiro aponta o desvio; fica verde quando afinado. */
+function prefersReducedMotion(): boolean {
+  return typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+/**
+ * Mostrador semicircular. O ponteiro é animado de forma IMPERATIVA com
+ * requestAnimationFrame (suavização exponencial independente do FPS), escrevendo
+ * direto no atributo `transform` via ref — sem re-render do React. Isso garante
+ * 60fps mesmo com a detecção atualizando a ~30Hz.
+ */
 export function TunerGauge({ cents, inTune, active }: TunerGaugeProps) {
   const c = cents == null ? 0 : Math.max(-50, Math.min(50, cents))
-  const angle = (c / 50) * MAX_ANGLE
+  const targetAngle = (c / 50) * MAX_ANGLE
+
+  const needleRef = useRef<SVGGElement>(null)
+  const targetRef = useRef(0)
+  const displayedRef = useRef(0)
+
+  // Mantém o alvo atualizado (atribuição de ref durante o render é segura).
+  targetRef.current = targetAngle
+
+  useEffect(() => {
+    let raf = 0
+    let lastT = performance.now()
+    const reduce = prefersReducedMotion()
+    const tau = 55 // constante de tempo (ms): menor = mais rápido/responsivo
+
+    const tick = (t: number) => {
+      raf = requestAnimationFrame(tick)
+      const dt = Math.min(64, t - lastT)
+      lastT = t
+
+      const target = targetRef.current
+      if (reduce) {
+        displayedRef.current = target
+      } else {
+        const k = 1 - Math.exp(-dt / tau)
+        displayedRef.current += (target - displayedRef.current) * k
+      }
+
+      const g = needleRef.current
+      if (g) {
+        g.setAttribute(
+          'transform',
+          `rotate(${displayedRef.current.toFixed(2)} ${PIVOT_X} ${PIVOT_Y})`,
+        )
+      }
+    }
+
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [])
 
   const needleColor = !active
     ? 'text-text-faint'
@@ -71,7 +121,7 @@ export function TunerGauge({ cents, inTune, active }: TunerGaugeProps) {
             y1={outer.y}
             x2={inner.x}
             y2={inner.y}
-            className={cls}
+            className={`transition-colors duration-300 ${cls}`}
             stroke="currentColor"
             strokeWidth={isZero ? 3 : isMajor ? 2 : 1.5}
             strokeLinecap="round"
@@ -79,8 +129,19 @@ export function TunerGauge({ cents, inTune, active }: TunerGaugeProps) {
         )
       })}
 
-      {/* ponteiro */}
-      <g transform={`rotate(${angle} ${PIVOT_X} ${PIVOT_Y})`} className={needleColor}>
+      {/* halo de "afinado" (aparece suavemente quando in-tune) */}
+      <circle
+        cx={PIVOT_X}
+        cy={PIVOT_Y}
+        r="13"
+        fill="currentColor"
+        className={`text-success transition-opacity duration-500 ${
+          inTune && active ? 'opacity-25' : 'opacity-0'
+        }`}
+      />
+
+      {/* ponteiro (transform controlado pelo rAF) */}
+      <g ref={needleRef} className={`transition-colors duration-200 ${needleColor}`}>
         <line
           x1={PIVOT_X}
           y1={PIVOT_Y}
@@ -91,7 +152,13 @@ export function TunerGauge({ cents, inTune, active }: TunerGaugeProps) {
           strokeLinecap="round"
         />
       </g>
-      <circle cx={PIVOT_X} cy={PIVOT_Y} r="5" className={needleColor} fill="currentColor" />
+      <circle
+        cx={PIVOT_X}
+        cy={PIVOT_Y}
+        r="5"
+        className={`transition-colors duration-200 ${needleColor}`}
+        fill="currentColor"
+      />
     </svg>
   )
 }
