@@ -1,8 +1,22 @@
-import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { useEffect } from 'react'
+import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AppShell } from './components/layout/AppShell'
 import { UpdateToast } from './components/layout/UpdateToast'
 import { SettingsProvider } from './context/SettingsContext'
+import { initAnalytics, trackPageView } from './lib/analytics/analytics'
 import { PATHS } from './routes/paths'
+
+/** Inicializa o analytics e dispara page_view a cada mudança de rota. */
+function AnalyticsTracker() {
+  const location = useLocation()
+  useEffect(() => {
+    initAnalytics()
+  }, [])
+  useEffect(() => {
+    trackPageView(location.pathname + location.search)
+  }, [location.pathname, location.search])
+  return null
+}
 import { TunerPage } from './routes/TunerPage'
 import { AboutPage } from './routes/settings/AboutPage'
 import { ContactPage } from './routes/settings/ContactPage'
@@ -15,6 +29,7 @@ export function App() {
   return (
     <SettingsProvider>
       <HashRouter>
+        <AnalyticsTracker />
         <AppShell>
           <Routes>
             <Route path={PATHS.tuner} element={<TunerPage />} />
