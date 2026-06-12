@@ -48,7 +48,7 @@ export function TunerGauge({ cents, inTune, active }: TunerGaugeProps) {
     let raf = 0
     let lastT = performance.now()
     const reduce = prefersReducedMotion()
-    const tau = 55 // constante de tempo (ms): menor = mais rápido/responsivo
+    const tau = 40 // constante de tempo (ms): menor = mais rápido/responsivo
 
     const tick = (t: number) => {
       raf = requestAnimationFrame(tick)

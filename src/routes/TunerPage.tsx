@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { CentsMeter } from '../components/tuner/CentsMeter'
 import { ChromaticToggle } from '../components/tuner/ChromaticToggle'
 import { InstrumentSelector } from '../components/tuner/InstrumentSelector'
+import { LevelMeter } from '../components/tuner/LevelMeter'
 import { MicPermissionPrompt } from '../components/tuner/MicPermissionPrompt'
 import { NoteDisplay } from '../components/tuner/NoteDisplay'
 import { StringSelector } from '../components/tuner/StringSelector'
@@ -38,6 +39,8 @@ export function TunerPage() {
           <div className="flex justify-center">
             <ChromaticToggle mode={mode} onChange={setMode} />
           </div>
+
+          <LevelMeter level={tuner.level} />
 
           <div className="flex flex-col items-center gap-3 pt-1">
             <TunerGauge

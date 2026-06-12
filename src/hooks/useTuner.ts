@@ -53,6 +53,8 @@ export interface TunerEngine {
   stop: () => void
   silent: boolean
   reading: TunerReading | null
+  /** nível de captação do microfone em [0,1] (para o medidor) */
+  level: number
   /** frequências-alvo de cada corda do instrumento ativo */
   stringFreqs: number[]
 }
@@ -65,7 +67,7 @@ export function useTuner({
 }: TunerEngineParams): TunerEngine {
   const mic = useMicrophone()
   const enabled = mic.state === 'running'
-  const { reading: raw, silent } = usePitchDetection(mic.analyser, mic.sampleRate, enabled)
+  const { reading: raw, silent, level } = usePitchDetection(mic.analyser, mic.sampleRate, enabled)
 
   const tuning = useMemo(() => getActiveTuning(instrument), [instrument])
   const stringFreqs = useMemo(
@@ -206,6 +208,7 @@ export function useTuner({
     stop: mic.stop,
     silent,
     reading,
+    level,
     stringFreqs,
   }
 }

@@ -10,14 +10,18 @@
 export const FFT_SIZE = 8192
 
 /**
- * Abaixo deste RMS tratamos como silêncio. Baixo o suficiente para acompanhar o
- * decaimento da corda, mas alto o bastante para que a cauda quase inaudível pare
- * de contar (senão a nota fica "presa" na tela por tempo demais).
+ * Abaixo deste RMS tratamos como silêncio. Baixo para captar bem (inclusive
+ * palhetadas suaves e o decaimento da corda). O medidor de captação mostra o
+ * nível mesmo abaixo deste valor.
  */
-export const RMS_GATE = 0.006
+export const RMS_GATE = 0.004
 
-/** Confiança mínima (correlação normalizada no período) para aceitar a leitura. */
-export const CLARITY_THRESHOLD = 0.85
+/**
+ * Confiança mínima (correlação normalizada no período) para aceitar a leitura.
+ * Mais baixa = trava mais rápido logo após a palhetada (quando a janela ainda
+ * está se enchendo da nota), ao custo de um pouco mais de ruído.
+ */
+export const CLARITY_THRESHOLD = 0.78
 
 /**
  * Retenção: por quanto tempo a nota continua na tela DEPOIS que o som cai abaixo
@@ -55,11 +59,14 @@ export const IN_TUNE_FRAMES = 3
  * do ataque (palhetada), o detector cospe notas erradas por 1–2 quadros; segurar
  * a nota anterior até a nova se confirmar evita mostrar tons intermediários.
  */
-export const NOTE_LOCK_FRAMES = 4
+export const NOTE_LOCK_FRAMES = 3
 
 /** Faixa de frequência válida (Hz). Abaixo/acima é ignorado como ruído. */
 export const MIN_FREQ = 28
 export const MAX_FREQ = 1300
 
-/** Intervalo mínimo entre detecções (ms) ~30Hz, suficiente e leve para mobile. */
-export const DETECT_INTERVAL_MS = 33
+/** Intervalo mínimo entre detecções (ms) ~40Hz — mais responsivo à palhetada. */
+export const DETECT_INTERVAL_MS = 25
+
+/** Release do medidor de nível por quadro (ataque instantâneo, queda suave). */
+export const LEVEL_RELEASE = 0.82
