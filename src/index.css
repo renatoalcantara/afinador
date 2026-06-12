@@ -23,10 +23,13 @@
   --c-border: #353535;
 }
 
+/* Tudo no MESMO viewport (dinâmico) para a navbar colar na base visível e não
+   sobrar fundo embaixo quando a barra do navegador aparece. 100vh é fallback. */
 html,
 body,
 #root {
-  height: 100%;
+  height: 100vh;
+  height: 100dvh;
 }
 
 /* Comportamento de app: o documento não rola nem faz "rubber-band" (elástico).
