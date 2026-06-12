@@ -15,6 +15,10 @@
   --c-border: #e3ddd3;
   --c-brand: #6366f1;
 
+  /* Altura do nav inferior (pílula 58px com borda + pt-2 8px + safe area do
+     indicador home). Reserva espaço no conteúdo, já que o nav é absolute. */
+  --nav-h: calc(66px + env(safe-area-inset-bottom, 0px));
+
   /* material do dial / chips */
   --dial-face: #ffffff;
   --dial-well: #e8e2d8;
