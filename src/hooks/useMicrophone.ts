@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { FFT_SIZE } from '../lib/audio/audioConstants'
+import { FFT_SIZE, INPUT_GAIN } from '../lib/audio/audioConstants'
 
 export type MicState = 'idle' | 'requesting' | 'running' | 'denied' | 'error' | 'unsupported'
 
@@ -56,10 +56,14 @@ export function useMicrophone(): MicHandle {
   // Monta source + analyser num contexto e publica o analyser para os consumidores.
   const buildGraph = useCallback((stream: MediaStream, ctx: AudioContext) => {
     const source = ctx.createMediaStreamSource(stream)
+    // Ganho de entrada: amplifica o sinal que alimenta o analisador (captação).
+    const gain = ctx.createGain()
+    gain.gain.value = INPUT_GAIN
     const node = ctx.createAnalyser()
     node.fftSize = FFT_SIZE
     node.smoothingTimeConstant = 0
-    source.connect(node)
+    source.connect(gain)
+    gain.connect(node)
 
     setAnalyser(node)
     setSampleRate(ctx.sampleRate)

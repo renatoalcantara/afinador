@@ -10,6 +10,14 @@
 export const FFT_SIZE = 8192
 
 /**
+ * Ganho de entrada aplicado por um GainNode entre o microfone e o analisador.
+ * Aumenta o nível de captação (medidor + sensibilidade da detecção). Não distorce
+ * a detecção de tom (que é normalizada). Suba para captar ainda mais; abaixe se o
+ * medidor ficar "estourado" no topo o tempo todo.
+ */
+export const INPUT_GAIN = 4
+
+/**
  * Abaixo deste RMS tratamos como silêncio. Baixo para captar bem (inclusive
  * palhetadas suaves e o decaimento da corda). O medidor de captação mostra o
  * nível mesmo abaixo deste valor.
