@@ -1,3 +1,4 @@
+import { InstallCard } from '../../components/settings/InstallCard'
 import { Card } from '../../components/ui/Card'
 import { ListRow } from '../../components/ui/ListRow'
 import { PageHeader } from '../../components/ui/PageHeader'
@@ -19,8 +20,10 @@ export function SettingsPage() {
   const { theme, setTheme } = useTheme()
 
   return (
-    <div className="flex flex-col gap-6 px-4 pb-6">
+    <div className="flex flex-col gap-6 px-4 pb-[var(--nav-h)]">
       <PageHeader title="Ajustes" sticky />
+
+      <InstallCard />
 
       <section>
         <SectionTitle>Visual</SectionTitle>
