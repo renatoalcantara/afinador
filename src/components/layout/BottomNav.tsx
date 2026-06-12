@@ -115,11 +115,11 @@ export function BottomNav() {
     <nav
       className="absolute inset-x-0 bottom-0 safe-x pointer-events-none pt-2"
       style={{
-        // Pílula flutuante: usa só uma fração do safe-area (o suficiente para
-        // ficar logo acima do home indicator), não os 34px completos — que
-        // deixavam um vão grande. var(--nav-debug-offset) é o ajuste fino.
-        paddingBottom:
-          'calc(max(env(safe-area-inset-bottom, 0px) * 0.4, 10px) + var(--nav-debug-offset, 0px))',
+        // Pílula flutuante. Em PWA standalone o iOS já gerencia o home indicator
+        // e env(safe-area-inset-bottom) volta 0 — então um respiro fixo de ~26px
+        // posiciona a pílula logo acima da base. Quando o safe-area é exposto
+        // (Safari, cover), usa só uma fração dele para não criar um vão grande.
+        paddingBottom: 'calc(max(env(safe-area-inset-bottom, 0px) * 0.4, 10px) + 16px)',
       }}
     >
       {/* absolute bottom-0 (não sticky/fixed): ancorado no fundo do container de

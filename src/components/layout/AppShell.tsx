@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import { useLocation } from 'react-router-dom'
-import { NavDebugger } from '../dev/NavDebugger'
 import { BottomNav } from './BottomNav'
 
 /** Estrutura geral: área de conteúdo rolável + navegação inferior fixa. */
@@ -19,7 +18,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </main>
       <BottomNav />
-      <NavDebugger />
     </div>
   )
 }
