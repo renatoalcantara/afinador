@@ -60,12 +60,39 @@ export function initAnalytics() {
   if (CLARITY_ID) loadClarity(CLARITY_ID)
 }
 
-/** Envia um page_view (GA) para a rota atual. */
-export function trackPageView(path: string) {
-  if (!ENABLED || !GA_ID || typeof window.gtag !== 'function') return
-  window.gtag('event', 'page_view', {
+/**
+ * Despacha um evento. Em produção envia ao GA (gtag); em dev apenas loga no
+ * console (para validar a instrumentação sem poluir os dados reais).
+ */
+function send(name: string, params?: Record<string, unknown>) {
+  if (import.meta.env.DEV) {
+    console.debug('[analytics]', name, params ?? {})
+    return
+  }
+  if (!GA_ID || typeof window.gtag !== 'function') return
+  window.gtag('event', name, params)
+}
+
+/** Envia um page_view para a rota atual. */
+export function trackPageView(path: string, title?: string) {
+  send('page_view', {
     page_path: path,
     page_location: window.location.href,
-    page_title: document.title,
+    page_title: title ?? document.title,
   })
+}
+
+/** Evento customizado. */
+export function trackEvent(name: string, params?: Record<string, unknown>) {
+  send(name, params)
+}
+
+/** Define propriedades de usuário no GA (ex.: tema em uso). */
+export function setUserProperties(props: Record<string, unknown>) {
+  if (import.meta.env.DEV) {
+    console.debug('[analytics] user_properties', props)
+    return
+  }
+  if (!GA_ID || typeof window.gtag !== 'function') return
+  window.gtag('set', 'user_properties', props)
 }
