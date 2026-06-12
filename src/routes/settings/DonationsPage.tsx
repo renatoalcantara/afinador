@@ -3,22 +3,43 @@ import { useState } from 'react'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { PageHeader } from '../../components/ui/PageHeader'
+import { Toast } from '../../components/ui/Toast'
 import { DONATIONS, pixQrValue } from '../../content/donations'
 import { trackEvent } from '../../lib/analytics/analytics'
 
+/** Copia texto com fallback para contextos sem Clipboard API (Safari/PWA). */
+async function copyText(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch {
+    try {
+      const ta = document.createElement('textarea')
+      ta.value = text
+      ta.style.position = 'fixed'
+      ta.style.opacity = '0'
+      document.body.appendChild(ta)
+      ta.select()
+      const ok = document.execCommand('copy')
+      document.body.removeChild(ta)
+      return ok
+    } catch {
+      return false
+    }
+  }
+}
+
 export function DonationsPage() {
   const [copied, setCopied] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
 
   const copyKey = async () => {
-    try {
-      await navigator.clipboard.writeText(DONATIONS.pixKey)
-      setCopied(true)
-      // Intenção de doar: copiar a chave Pix é o sinal mais forte de conversão.
-      trackEvent('donation_copy_pix')
-      setTimeout(() => setCopied(false), 2000)
-    } catch {
-      // clipboard pode falhar sem HTTPS/permissão — ignora silenciosamente
-    }
+    if (!(await copyText(DONATIONS.pixKey))) return
+    setCopied(true)
+    setToast('Pronto, chave copiada 💜')
+    // Intenção de doar: copiar a chave Pix é o sinal mais forte de conversão.
+    trackEvent('donation_copy_pix')
+    setTimeout(() => setCopied(false), 2000)
   }
 
   return (
@@ -40,13 +61,15 @@ export function DonationsPage() {
         </div>
 
         <Button variant="brand" fullWidth onClick={copyKey}>
-          {copied ? 'Chave copiada!' : 'Copiar chave Pix'}
+          {copied ? 'Copiei! valeu 💜' : 'Copiar a chave Pix'}
         </Button>
       </Card>
 
       <p className="px-1 text-center text-xs text-text-faint">
-        Aponte a câmera do seu banco para o QR Code ou use a chave acima.
+        Aponta a câmera do banco no QR, ou usa a chave aí de cima.
       </p>
+
+      <Toast message={toast} onDismiss={() => setToast(null)} />
     </div>
   )
 }

@@ -6,8 +6,8 @@ import { CONTACT_EMAIL } from '../routes/paths'
 // Enquanto `pixPayload` estiver vazio, o QR codifica a própria chave (apenas como texto).
 export const DONATIONS = {
   intro:
-    'O Afinador é gratuito e sem anúncios. Se ele te ajuda, considere apoiar o projeto com qualquer valor via Pix. Obrigado! 🙏',
-  pixKeyLabel: 'Chave Pix (e-mail)',
+    'Esse app roda a café e boa vontade ☕. Se ele te salvou antes de um show, manda um Pix de qualquer valor. Vai pra gasolina dos próximos updates 🙏',
+  pixKeyLabel: 'Chave Pix (é o meu e-mail)',
   pixKey: CONTACT_EMAIL,
   pixPayload: '',
 }
