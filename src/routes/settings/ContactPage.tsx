@@ -6,7 +6,7 @@ import { CONTACT_EMAIL } from '../paths'
 export function ContactPage() {
   const subject = encodeURIComponent('Oi, vim pelo Afinador')
   return (
-    <div className="flex flex-col gap-5 px-4 pb-6">
+    <div className="flex flex-col gap-5 px-4 pb-[var(--nav-h)]">
       <PageHeader title="Fala comigo" back sticky />
 
       <p className="px-1 text-text-soft">

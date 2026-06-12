@@ -40,7 +40,7 @@ export function DonationsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-5 px-4 pb-6">
+    <div className="flex flex-col gap-5 px-4 pb-[var(--nav-h)]">
       <PageHeader title="Doações" back sticky />
 
       <p className="px-1 text-text-soft">{DONATIONS.intro}</p>

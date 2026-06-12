@@ -122,6 +122,14 @@ export function BottomNav() {
         paddingBottom: 'calc(max(env(safe-area-inset-bottom, 0px) * 0.4, 10px) + 16px)',
       }}
     >
+      {/* Glass: blur do conteúdo que passa atrás da nav. A máscara em gradiente
+          deixa o blur transparente no topo e cada vez mais forte em direção à
+          base — funde a nav com o fundo sem uma borda dura. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 backdrop-blur-xl [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_55%)] [mask-image:linear-gradient(to_bottom,transparent,black_55%)]"
+      />
+
       {/* absolute bottom-0 (não sticky/fixed): ancorado no fundo do container de
           100dvh. Folga inferior = o safe-area-inset (rente ao fundo onde é 0, e
           só o necessário acima do indicador home no iOS). px-4 num wrapper
