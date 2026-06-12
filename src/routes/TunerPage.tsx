@@ -61,9 +61,12 @@ export function TunerPage() {
 
       {running ? (
         <div className="flex min-h-0 flex-1 flex-col pb-2">
-          <LevelMeter level={tuner.level} />
+          <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-2">
+            {/* medidor de captação: vertical, colado à direita e centralizado */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2">
+              <LevelMeter level={tuner.level} />
+            </div>
 
-          <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2">
             <TunerGauge
               cents={tuner.reading?.cents ?? null}
               inTune={tuner.reading?.inTune ?? false}
