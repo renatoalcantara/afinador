@@ -15,7 +15,7 @@ export const FFT_SIZE = 8192
  * a detecção de tom (que é normalizada). Suba para captar ainda mais; abaixe se o
  * medidor ficar "estourado" no topo o tempo todo.
  */
-export const INPUT_GAIN = 4
+export const INPUT_GAIN = 2
 
 /**
  * Abaixo deste RMS tratamos como silêncio. Baixo para captar bem (inclusive
