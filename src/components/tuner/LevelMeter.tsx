@@ -23,7 +23,7 @@ export function LevelMeter({ level }: LevelMeterProps) {
       <div className="flex h-32 w-1.5 flex-col-reverse items-stretch gap-0.5">
         {Array.from({ length: SEGMENTS }, (_, i) => {
           const on = i < lit
-          const color = i >= 10 ? 'bg-error' : i >= 8 ? 'bg-brand' : 'bg-success'
+          const color = i >= 9 ? 'bg-brand' : 'bg-text-soft'
           return (
             <span
               key={i}
@@ -35,7 +35,7 @@ export function LevelMeter({ level }: LevelMeterProps) {
       {/* luz: acende quando há sinal */}
       <span
         className={`h-2 w-2 shrink-0 rounded-full transition-colors duration-100 ${
-          active ? 'bg-success shadow-glow-success' : 'bg-surface-2'
+          active ? 'bg-brand shadow-[0_0_8px_rgba(99,102,241,0.65)]' : 'bg-surface-2'
         }`}
       />
     </div>

@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react'
-import { CentsMeter } from '../components/tuner/CentsMeter'
-import { InstrumentSelector } from '../components/tuner/InstrumentSelector'
+import { InstrumentSheet } from '../components/tuner/InstrumentSheet'
 import { LevelMeter } from '../components/tuner/LevelMeter'
 import { MicPermissionPrompt } from '../components/tuner/MicPermissionPrompt'
-import { NoteDisplay } from '../components/tuner/NoteDisplay'
 import { StringSelector } from '../components/tuner/StringSelector'
-import { TunerGauge } from '../components/tuner/TunerGauge'
-import { TuningSelector } from '../components/tuner/TuningSelector'
+import { TunerDial } from '../components/tuner/TunerDial'
 import { PageHeader } from '../components/ui/PageHeader'
 import { useSettings } from '../context/SettingsContext'
 import { useTuner } from '../hooks/useTuner'
@@ -15,6 +12,7 @@ import { getActiveTuning, getInstrument } from '../lib/instruments/instruments'
 export function TunerPage() {
   const { instrumentId, setInstrumentId, tuningId, setTuningId, mode, a4 } = useSettings()
   const [manualStringIndex, setManualStringIndex] = useState<number | null>(null)
+  const [sheetOpen, setSheetOpen] = useState(false)
 
   const instrument = getInstrument(instrumentId)
   const activeTuning = getActiveTuning(instrument, tuningId)
@@ -57,33 +55,24 @@ export function TunerPage() {
 
   return (
     <div className="flex h-full flex-col px-4">
-      <PageHeader title="Afinador" eyebrow={eyebrow} />
+      <PageHeader
+        title="Afinador"
+        eyebrow={eyebrow}
+        onEyebrowPress={mode === 'instrument' ? () => setSheetOpen(true) : undefined}
+      />
 
       {running ? (
         <div className="flex min-h-0 flex-1 flex-col pb-2">
-          <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-2">
+          {/* dial + cordas juntos (proximidade), centralizados */}
+          <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-5">
             {/* medidor de captação: vertical, colado à direita e centralizado */}
             <div className="absolute right-0 top-1/2 -translate-y-1/2">
               <LevelMeter level={tuner.level} />
             </div>
 
-            <TunerGauge
-              cents={tuner.reading?.cents ?? null}
-              inTune={tuner.reading?.inTune ?? false}
-              active={!tuner.silent && tuner.reading != null}
-            />
-            <NoteDisplay reading={tuner.reading} silent={tuner.silent} />
-            <CentsMeter reading={tuner.reading} silent={tuner.silent} />
-          </div>
+            <TunerDial reading={tuner.reading} silent={tuner.silent} />
 
-          {mode === 'instrument' && (
-            <div className="flex animate-fade-in flex-col gap-3">
-              <InstrumentSelector value={instrumentId} onChange={setInstrumentId} />
-              <TuningSelector
-                tunings={instrument.tunings}
-                value={tuningId}
-                onChange={setTuningId}
-              />
+            {mode === 'instrument' && (
               <StringSelector
                 strings={strings}
                 activeIndex={tuner.reading?.stringIndex ?? null}
@@ -91,14 +80,24 @@ export function TunerPage() {
                 inTune={tuner.reading?.inTune ?? false}
                 onSelect={setManualStringIndex}
               />
-            </div>
-          )}
+            )}
+          </div>
         </div>
       ) : (
         <div className="flex min-h-0 flex-1 items-center justify-center">
           <MicPermissionPrompt state={tuner.micState} error={tuner.error} onStart={start} />
         </div>
       )}
+
+      <InstrumentSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        instrument={instrument}
+        instrumentId={instrumentId}
+        onInstrument={setInstrumentId}
+        tuningId={tuningId}
+        onTuning={setTuningId}
+      />
     </div>
   )
 }
