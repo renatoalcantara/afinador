@@ -117,7 +117,8 @@ export function useTuner({
     if (isAttack) smootherRef.current.reset()
 
     const freq = smootherRef.current.push(raw.frequency)
-    const note = analyzeFrequency(freq, a4)
+    let note = analyzeFrequency(freq, a4)
+    let displayFreq = freq
 
     let targetFreq: number
     let targetLabel: string
@@ -129,23 +130,32 @@ export function useTuner({
       cents = note.centsOff
       targetLabel = `${note.noteName}${note.octave}`
     } else {
-      let idx = manualStringIndex
-      if (idx == null) {
-        let best = 0
-        let bestAbs = Infinity
-        stringFreqs.forEach((tf, i) => {
-          const c = Math.abs(centsBetween(freq, tf))
-          if (c < bestAbs) {
-            bestAbs = c
-            best = i
+      // Corrige erro de oitava (harmônico detectado no lugar da fundamental):
+      // testa a freq, a metade e o dobro, e escolhe a (corda, oitava) mais próxima.
+      // Assim o ponteiro deixa de cravar no limite quando o detector "pula" a oitava.
+      const MULTS = [0.5, 1, 2]
+      const candidates =
+        manualStringIndex != null ? [manualStringIndex] : stringFreqs.map((_, i) => i)
+      let bestIdx = candidates[0]
+      let bestCents = Infinity
+      let bestMult = 1
+      for (const i of candidates) {
+        const tf = stringFreqs[i]
+        for (const m of MULTS) {
+          const c = centsBetween(freq * m, tf)
+          if (Math.abs(c) < Math.abs(bestCents)) {
+            bestCents = c
+            bestIdx = i
+            bestMult = m
           }
-        })
-        idx = best
+        }
       }
-      stringIndex = idx
-      targetFreq = stringFreqs[idx]
-      cents = centsBetween(freq, targetFreq)
-      const st = tuning.strings[idx]
+      stringIndex = bestIdx
+      targetFreq = stringFreqs[bestIdx]
+      cents = bestCents
+      displayFreq = freq * bestMult
+      note = analyzeFrequency(displayFreq, a4)
+      const st = tuning.strings[bestIdx]
       targetLabel = `${st.note}${st.octave}`
     }
 
@@ -173,7 +183,7 @@ export function useTuner({
       }
 
       setReading({
-        frequency: freq,
+        frequency: displayFreq,
         note,
         targetLabel,
         targetFreq,
