@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { ThemeToggle } from './ThemeToggle'
 
 interface PageHeaderProps {
   title: string
@@ -45,6 +46,9 @@ export function PageHeader({ title, back = false, eyebrow }: PageHeaderProps) {
           )}
           <h1 className="text-2xl font-semibold tracking-display text-text">{title}</h1>
         </div>
+      </div>
+      <div className="ml-auto">
+        <ThemeToggle />
       </div>
     </header>
   )

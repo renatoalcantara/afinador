@@ -11,11 +11,13 @@ import { DEFAULT_INSTRUMENT_ID } from '../lib/instruments/instruments'
 import type { InstrumentId } from '../lib/instruments/types'
 import { A4 } from '../lib/music/noteUtils'
 import type { ThemeChoice } from '../lib/theme/tokens'
+import type { TunerMode } from '../hooks/useTuner'
 
 const KEYS = {
   theme: 'afinador:theme',
   instrument: 'afinador:instrument',
   a4: 'afinador:a4',
+  mode: 'afinador:mode',
 } as const
 
 interface SettingsValue {
@@ -25,6 +27,10 @@ interface SettingsValue {
 
   instrumentId: InstrumentId
   setInstrumentId: (id: InstrumentId) => void
+
+  /** modo do afinador (controlado pela navbar) */
+  mode: TunerMode
+  setMode: (m: TunerMode) => void
 
   a4: number
   setA4: (hz: number) => void
@@ -47,6 +53,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   )
   const [instrumentId, setInstrumentIdState] = useState<InstrumentId>(() =>
     readStored<InstrumentId>(KEYS.instrument, DEFAULT_INSTRUMENT_ID),
+  )
+  const [mode, setModeState] = useState<TunerMode>(() =>
+    readStored<TunerMode>(KEYS.mode, 'instrument'),
   )
   const [a4, setA4State] = useState<number>(() => {
     const stored = Number(readStored(KEYS.a4, String(A4)))
@@ -85,6 +94,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(KEYS.instrument, id)
   }, [])
 
+  const setMode = useCallback((m: TunerMode) => {
+    setModeState(m)
+    localStorage.setItem(KEYS.mode, m)
+  }, [])
+
   const setA4 = useCallback((hz: number) => {
     setA4State(hz)
     localStorage.setItem(KEYS.a4, String(hz))
@@ -97,10 +111,12 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       setTheme,
       instrumentId,
       setInstrumentId,
+      mode,
+      setMode,
       a4,
       setA4,
     }),
-    [theme, resolvedTheme, setTheme, instrumentId, setInstrumentId, a4, setA4],
+    [theme, resolvedTheme, setTheme, instrumentId, setInstrumentId, mode, setMode, a4, setA4],
   )
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>
