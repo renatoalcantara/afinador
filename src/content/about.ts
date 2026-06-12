@@ -3,6 +3,8 @@ export const ABOUT = {
   appName: 'Afinador',
   version: '0.1.0',
   creator: 'Renato Alcântara',
+  siteUrl: 'https://alcantara.design',
+  siteLabel: 'alcantara.design',
   paragraphs: [
     'Um afinador gratuito e sem anúncios pra violão, guitarra, ukulele e baixo, direto pelo microfone do celular.',
     'A real é que eu cansei de abrir afinador e levar mais anúncio que afinação. Esse aqui é o oposto: abre e afina, sem propaganda no meio.',
