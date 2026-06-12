@@ -9,19 +9,22 @@ function GuitarIcon() {
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <g
         stroke="currentColor"
-        strokeWidth="1.7"
+        strokeWidth="1.4"
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        {/* braço */}
-        <path d="M13.2 10.8 18.6 5.4" />
         {/* headstock + tarraxas */}
-        <path d="M17.4 4.2 19.8 6.6" />
-        <path d="M19.1 3.7l-1 1M20.5 5.1l-1 1" />
+        <rect x="10.1" y="1.6" width="3.8" height="3.6" rx="1.2" />
+        <path d="M10.1 2.6H8.5M10.1 4H8.5M13.9 2.6H15.5M13.9 4H15.5" />
+        {/* braço (cordas) */}
+        <path d="M10.8 5.4V12.8M13.2 5.4V12.8" />
         {/* corpo em forma de 8 */}
-        <path d="M13.2 10.8c-1.4-1.4-3.6-1.4-5 0-.8.8-1 1.8-.6 2.7.3.8-.1 1.4-.7 2-1.5 1.5-1.6 3.8-.1 5.3 1.5 1.5 3.8 1.4 5.3-.1.6-.6 1-1.2.7-2-.4-.9-.2-1.9.6-2.7 1.4-1.4 1.4-3.6 0-5Z" />
+        <path d="M10.3 12.4C8.5 12.7 8 14.4 8.9 15.9 9.4 16.7 9.1 17.2 8.5 17.9 7 19.4 7.9 22.4 12 22.4 16.1 22.4 17 19.4 15.5 17.9 14.9 17.2 14.6 16.7 15.1 15.9 16 14.4 15.5 12.7 13.7 12.4" />
         {/* boca */}
-        <circle cx="10" cy="15" r="1.5" />
+        <circle cx="12" cy="15.4" r="1.95" />
+        {/* ponte */}
+        <path d="M10.7 18.9H13.3" />
+        <path d="M9.9 20.5H14.1" />
       </g>
     </svg>
   )
