@@ -6,26 +6,28 @@ import { MicPermissionPrompt } from '../components/tuner/MicPermissionPrompt'
 import { NoteDisplay } from '../components/tuner/NoteDisplay'
 import { StringSelector } from '../components/tuner/StringSelector'
 import { TunerGauge } from '../components/tuner/TunerGauge'
+import { TuningSelector } from '../components/tuner/TuningSelector'
 import { PageHeader } from '../components/ui/PageHeader'
 import { useSettings } from '../context/SettingsContext'
 import { useTuner } from '../hooks/useTuner'
 import { getActiveTuning, getInstrument } from '../lib/instruments/instruments'
 
 export function TunerPage() {
-  const { instrumentId, setInstrumentId, mode, a4 } = useSettings()
+  const { instrumentId, setInstrumentId, tuningId, setTuningId, mode, a4 } = useSettings()
   const [manualStringIndex, setManualStringIndex] = useState<number | null>(null)
 
   const instrument = getInstrument(instrumentId)
-  const strings = getActiveTuning(instrument).strings
+  const activeTuning = getActiveTuning(instrument, tuningId)
+  const strings = activeTuning.strings
 
-  const tuner = useTuner({ instrument, mode, manualStringIndex, a4 })
+  const tuner = useTuner({ instrument, tuningId, mode, manualStringIndex, a4 })
   const running = tuner.micState === 'running'
   const { start } = tuner
 
-  // Ao trocar de instrumento, volta a corda para automático.
+  // Ao trocar de instrumento ou afinação, volta a corda para automático.
   useEffect(() => {
     setManualStringIndex(null)
-  }, [instrumentId])
+  }, [instrumentId, tuningId])
 
   // Se a permissão do microfone já foi concedida, inicia sozinho (sem re-perguntar).
   useEffect(() => {
@@ -46,17 +48,21 @@ export function TunerPage() {
     }
   }, [start])
 
+  const eyebrow =
+    mode === 'chromatic'
+      ? 'Cromático'
+      : activeTuning.id === 'standard'
+        ? instrument.name
+        : `${instrument.name} · ${activeTuning.shortName}`
+
   return (
     <div className="flex h-full flex-col px-4">
-      <PageHeader title="Afinador" eyebrow={mode === 'chromatic' ? 'Cromático' : instrument.name} />
+      <PageHeader title="Afinador" eyebrow={eyebrow} />
 
       {running ? (
         <div className="flex min-h-0 flex-1 flex-col pb-2">
-          {/* Acima do ponteiro só há elementos constantes nos dois modos → o
-              ponteiro fica fixo ao alternar Instrumento/Cromático na navbar. */}
           <LevelMeter level={tuner.level} />
 
-          {/* Área do ponteiro: flexível e centralizada (absorve a sobra de espaço). */}
           <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2">
             <TunerGauge
               cents={tuner.reading?.cents ?? null}
@@ -67,10 +73,14 @@ export function TunerPage() {
             <CentsMeter reading={tuner.reading} silent={tuner.silent} />
           </div>
 
-          {/* Seletores abaixo do ponteiro (só no modo Instrumento). */}
           {mode === 'instrument' && (
             <div className="flex animate-fade-in flex-col gap-3">
               <InstrumentSelector value={instrumentId} onChange={setInstrumentId} />
+              <TuningSelector
+                tunings={instrument.tunings}
+                value={tuningId}
+                onChange={setTuningId}
+              />
               <StringSelector
                 strings={strings}
                 activeIndex={tuner.reading?.stringIndex ?? null}

@@ -18,6 +18,7 @@ const KEYS = {
   instrument: 'afinador:instrument',
   a4: 'afinador:a4',
   mode: 'afinador:mode',
+  tunings: 'afinador:tunings',
 } as const
 
 interface SettingsValue {
@@ -27,6 +28,10 @@ interface SettingsValue {
 
   instrumentId: InstrumentId
   setInstrumentId: (id: InstrumentId) => void
+
+  /** afinação ativa do instrumento atual */
+  tuningId: string
+  setTuningId: (id: string) => void
 
   /** modo do afinador (controlado pela navbar) */
   mode: TunerMode
@@ -54,6 +59,13 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const [instrumentId, setInstrumentIdState] = useState<InstrumentId>(() =>
     readStored<InstrumentId>(KEYS.instrument, DEFAULT_INSTRUMENT_ID),
   )
+  const [tuningsMap, setTuningsMap] = useState<Partial<Record<InstrumentId, string>>>(() => {
+    try {
+      return JSON.parse(localStorage.getItem(KEYS.tunings) ?? '{}') as Partial<Record<InstrumentId, string>>
+    } catch {
+      return {}
+    }
+  })
   const [mode, setModeState] = useState<TunerMode>(() =>
     readStored<TunerMode>(KEYS.mode, 'instrument'),
   )
@@ -89,10 +101,20 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(KEYS.theme, t)
   }, [])
 
+  const tuningId = tuningsMap[instrumentId] ?? 'standard'
+
   const setInstrumentId = useCallback((id: InstrumentId) => {
     setInstrumentIdState(id)
     localStorage.setItem(KEYS.instrument, id)
   }, [])
+
+  const setTuningId = useCallback((id: string) => {
+    setTuningsMap((prev) => {
+      const next = { ...prev, [instrumentId]: id }
+      localStorage.setItem(KEYS.tunings, JSON.stringify(next))
+      return next
+    })
+  }, [instrumentId])
 
   const setMode = useCallback((m: TunerMode) => {
     setModeState(m)
@@ -111,12 +133,14 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       setTheme,
       instrumentId,
       setInstrumentId,
+      tuningId,
+      setTuningId,
       mode,
       setMode,
       a4,
       setA4,
     }),
-    [theme, resolvedTheme, setTheme, instrumentId, setInstrumentId, mode, setMode, a4, setA4],
+    [theme, resolvedTheme, setTheme, instrumentId, setInstrumentId, tuningId, setTuningId, mode, setMode, a4, setA4],
   )
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>

@@ -10,11 +10,12 @@ export interface StringSpec {
 export interface Tuning {
   id: string
   name: string
+  shortName: string
   /** ordenadas da corda mais grave (índice 0) à mais aguda */
   strings: StringSpec[]
 }
 
-export type InstrumentId = 'violao' | 'guitarra' | 'ukulele' | 'baixo'
+export type InstrumentId = 'violao' | 'guitarra' | 'ukulele' | 'baixo' | 'baixo5'
 
 export interface Instrument {
   id: InstrumentId

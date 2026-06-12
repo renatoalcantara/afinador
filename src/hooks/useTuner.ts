@@ -40,6 +40,7 @@ export interface TunerReading {
 
 export interface TunerEngineParams {
   instrument: Instrument
+  tuningId: string
   mode: TunerMode
   /** corda fixada manualmente; null = detecção automática da corda mais próxima */
   manualStringIndex: number | null
@@ -61,6 +62,7 @@ export interface TunerEngine {
 
 export function useTuner({
   instrument,
+  tuningId,
   mode,
   manualStringIndex,
   a4,
@@ -69,7 +71,7 @@ export function useTuner({
   const enabled = mic.state === 'running'
   const { reading: raw, silent, level } = usePitchDetection(mic.analyser, mic.sampleRate, enabled)
 
-  const tuning = useMemo(() => getActiveTuning(instrument), [instrument])
+  const tuning = useMemo(() => getActiveTuning(instrument, tuningId), [instrument, tuningId])
   const stringFreqs = useMemo(
     () => tuning.strings.map((s) => midiToFreq(noteToMidi(s.note, s.octave), a4)),
     [tuning, a4],
@@ -96,10 +98,10 @@ export function useTuner({
     setReading(null)
   }
 
-  // Recomeça do zero ao trocar instrumento/modo.
+  // Recomeça do zero ao trocar instrumento, afinação ou modo.
   useEffect(() => {
     resetState()
-  }, [instrument.id, mode])
+  }, [instrument.id, tuningId, mode])
 
   // Em silêncio, reseta tudo para não misturar notas após uma pausa.
   useEffect(() => {
